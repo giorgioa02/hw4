@@ -1,0 +1,204 @@
+<launch>
+
+  <!-- change the output directory and prefix if this is not where yours is mapped -->
+  <arg name="bagfileout" default="/ros/catkin_ws/HW4"/>
+
+  <!-- sets the initial parameters of the cars in the platoon. -->
+  <param name="/leadcar/x0" type="double" value="40.0" />
+  <param name="/car1/x0" type="double" value="30.0" />
+  <param name="/car2/x0" type="double" value="20.0" />
+  <param name="/car3/x0" type="double" value="10.0" />
+  <param name="/car4/x0" type="double" value="0.0" />
+  <param name="/car5/x0" type="double" value="-10.0" />
+  <param name="/car6/x0" type="double" value="-20.0" />
+  <param name="/car7/x0" type="double" value="-30.0" />
+  <param name="/car8/x0" type="double" value="-40.0" />
+
+  <!-- change the start time if needed -->
+  <node pkg="rosbag" type="play" name="rosbag_player" args="/ros/catkin_ws/mytest.bag --topics /car/state/vel_x -s 100">
+    <!-- remap the output to go into the desired car -->
+    <remap from="/car/state/vel_x" to="/leadcar/vel_x" />
+  </node>
+  
+  <!-- By putting this car into a namespace, we keep the variables clean -->
+  <group ns="leadcar">
+    <node pkg="odometer" type="odometer" name="odometer_leadcar">
+    </node>
+  </group>
+
+  <!-- Platoon namespace-->
+  <group ns="platoon">
+
+    <group ns="car1">
+      <node pkg="odometer" type="odometer" name="odometer_car1"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car1/cmd_accel" />
+        <remap from="/lead_dist" to="/car1/lead_dist" />
+        <remap from="/rel_vel" to="/car1/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car1/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car1">
+        <remap from="in1" to="/leadcar/vel_x" />
+        <remap from="in2" to="/car1/vel_x" />
+        <remap from="diff" to="/car1/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car1">
+        <remap from="in1" to="/leadcar/odom" />
+        <remap from="in2" to="/car1/odom_x" />
+        <remap from="diff" to="/car1/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car2">
+      <node pkg="odometer" type="odometer" name="odometer_car2"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car2/cmd_accel" />
+        <remap from="/lead_dist" to="/car2/lead_dist" />
+        <remap from="/rel_vel" to="/car2/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car2/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car2">
+        <remap from="in1" to="/car1/vel_x" />
+        <remap from="in2" to="/car2/vel_x" />
+        <remap from="diff" to="/car2/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car2">
+        <remap from="in1" to="/car1/odom" />
+        <remap from="in2" to="/car2/odom_x" />
+        <remap from="diff" to="/car2/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car3">
+      <node pkg="odometer" type="odometer" name="odometer_car3"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car3/cmd_accel" />
+        <remap from="/lead_dist" to="/car3/lead_dist" />
+        <remap from="/rel_vel" to="/car3/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car3/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car3">
+        <remap from="in1" to="/car2/vel_x" />
+        <remap from="in2" to="/car3/vel_x" />
+        <remap from="diff" to="/car3/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car3">
+        <remap from="in1" to="/car2/odom" />
+        <remap from="in2" to="/car3/odom_x" />
+        <remap from="diff" to="/car3/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car4">
+      <node pkg="odometer" type="odometer" name="odometer_car4"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car4/cmd_accel" />
+        <remap from="/lead_dist" to="/car4/lead_dist" />
+        <remap from="/rel_vel" to="/car4/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car4/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car4">
+        <remap from="in1" to="/car3/vel_x" />
+        <remap from="in2" to="/car4/vel_x" />
+        <remap from="diff" to="/car4/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car4">
+        <remap from="in1" to="/car3/odom" />
+        <remap from="in2" to="/car4/odom_x" />
+        <remap from="diff" to="/car4/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car5">
+      <node pkg="odometer" type="odometer" name="odometer_car5"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car5/cmd_accel" />
+        <remap from="/lead_dist" to="/car5/lead_dist" />
+        <remap from="/rel_vel" to="/car5/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car5/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car5">
+        <remap from="in1" to="/car4/vel_x" />
+        <remap from="in2" to="/car5/vel_x" />
+        <remap from="diff" to="/car5/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car5">
+        <remap from="in1" to="/car4/odom" />
+        <remap from="in2" to="/car5/odom_x" />
+        <remap from="diff" to="/car5/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car6">
+      <node pkg="odometer" type="odometer" name="odometer_car6"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car6/cmd_accel" />
+        <remap from="/lead_dist" to="/car6/lead_dist" />
+        <remap from="/rel_vel" to="/car6/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car6/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car6">
+        <remap from="in1" to="/car5/vel_x" />
+        <remap from="in2" to="/car6/vel_x" />
+        <remap from="diff" to="/car6/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car6">
+        <remap from="in1" to="/car5/odom" />
+        <remap from="in2" to="/car6/odom_x" />
+        <remap from="diff" to="/car6/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car7">
+      <node pkg="odometer" type="odometer" name="odometer_car7"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car7/cmd_accel" />
+        <remap from="/lead_dist" to="/car7/lead_dist" />
+        <remap from="/rel_vel" to="/car7/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car7/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car7">
+        <remap from="in1" to="/car6/vel_x" />
+        <remap from="in2" to="/car7/vel_x" />
+        <remap from="diff" to="/car7/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car7">
+        <remap from="in1" to="/car6/odom" />
+        <remap from="in2" to="/car7/odom_x" />
+        <remap from="diff" to="/car7/lead_dist" />
+      </node>
+    </group>
+
+    <group ns="car8">
+      <node pkg="odometer" type="odometer" name="odometer_car8"/>
+      <node pkg="carsimplesimulink" type="carsimplesimulink" name="carsimplesimulink_node"/>
+      <node pkg="skynetmini_controller2" type="skynetmini_controller2" name="skynetmini_controller2_node">
+        <remap from="/cmd_accel" to="/car8/cmd_accel" />
+        <remap from="/lead_dist" to="/car8/lead_dist" />
+        <remap from="/rel_vel" to="/car8/rel_vel" />
+        <remap from="/car/state/vel_x" to="/car8/vel_x" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_relvel_car8">
+        <remap from="in1" to="/car7/vel_x" />
+        <remap from="in2" to="/car8/vel_x" />
+        <remap from="diff" to="/car8/rel_vel" />
+      </node>
+      <node pkg="subtractor" type="subtractor" name="subtractor_odom_car8">
+        <remap from="in1" to="/car7/odom" />
+        <remap from="in2" to="/car8/odom_x" />
+        <remap from="diff" to="/car8/lead_dist" />
+      </node>
+    </group>
+  </group>
+
+  <!-- change the output directory if this is not where yours is mapped -->
+  <node pkg="rosbag" type="record" name="rosbag_recorder" args="-a -o $(arg bagfileout)" />
+  
+</launch>
